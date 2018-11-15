@@ -12,22 +12,17 @@ const options = {
 var mailer = nodemailer.createTransport(sgTransport(options));
 
 const send = (req, res, next) => {
-  emailAddress = req.body.email;
-  if (emailAddress === undefined) {
-    logger.error('An error has occurred: the email address is undefined');
-    res.send('the email address is undefined');
-    return next(false);
-  }
+  const { email, from, subject, text } = req.body
 
-  var email = {
-    from: 'web@heliosinteractive.com',
-    to: req.body.email,
-    subject: 'Hello',
-    text: 'Hello world',
+  const emailObject = {
+    to: email,
+    from,
+    subject,
+    text,
     html: '<b>Hello world</b>'
   };
 
-  mailer.sendMail(email, (err, sendGridRes) => {
+  mailer.sendMail(emailObject, (err, sendGridRes) => {
     if (err || sendGridRes.message !== 'success') {
       logger.error('An error has occurred while attempting to send email: ', err, sendGridRes);
       return next((err || sendGridRes), false);
