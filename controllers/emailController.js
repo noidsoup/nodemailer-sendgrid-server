@@ -9,10 +9,11 @@ const options = {
   }
 };
 
-var mailer = nodemailer.createTransport(sgTransport(options));
+const mailer = nodemailer.createTransport(sgTransport(options));
 
 const emailController = (req, res, err) => {
   if (err) {
+    logger.error('Error making request to emailController', err);
     throw err;
   };
 
@@ -31,9 +32,8 @@ const emailController = (req, res, err) => {
 
   savedEmail.save((err, res) => {
     if (err) {
-      const error = `Error saving email object to MongoDB: ${err}`;
-      logger.error(error);
-      throw error;
+      logger.error(`Error saving email object to MongoDB: ${err}`);
+      throw err;
     }
 
     id = res._id;
