@@ -11,9 +11,8 @@ const options = {
 
 var mailer = nodemailer.createTransport(sgTransport(options));
 
-const send = (req, res, next) => {
+const emailController = (req, res, next) => {
   const { email, from, subject, text } = req.body
-
   const emailObject = {
     to: email,
     from,
@@ -32,4 +31,4 @@ const send = (req, res, next) => {
   });
 };
 
-module.exports = send;
+module.exports = emailController;
