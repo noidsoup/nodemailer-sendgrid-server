@@ -5,13 +5,13 @@ const router = express.Router();
 
 router.post('/send', [
   [
-    check('email').exists(),
+    check('to').exists(),
     check('from').exists(),
     check('subject').exists(),
     check('text').exists(),
   ],
 
-  check("email")
+  check("to")
     .isEmail()
     .isString()
     .not().isEmpty()
@@ -24,6 +24,7 @@ router.post('/send', [
     .escape(),
   check("subject")
     .isString()
+    .isLength({ max: 78 })
     .not().isEmpty()
     .trim()
     .escape(),
