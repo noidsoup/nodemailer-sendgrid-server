@@ -43,19 +43,21 @@ const emailController = (req, res, err) => {
   mailer.sendMail(email, (err, sendGridRes) => {
     if (err || sendGridRes.message !== 'success') {
       logger.error('An error has occurred while attempting to send email: ', err, sendGridRes);
+      res.sendStatus(500);
       throw(err || sendGridRes);
     }
 
     Email.findOneAndUpdate({_id: id}, { sent: true }, ((err, res) => {
       if (err) {
         logger.error('Error saving email to MongoDB', err);
+        res.sendStatus(500);
         throw err;
       }
-      logger.info('saved record with id of', id)
+      logger.info('Saved email')
     }))
 
     logger.info(`Sendgrid responded with: ${sendGridRes.message}`);
-    res.send(`${sendGridRes.message}!`);
+    res.sendStatus(200);
   });
 };
 

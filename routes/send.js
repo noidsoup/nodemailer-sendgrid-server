@@ -24,6 +24,7 @@ router.post('/send', [
     .escape(),
   check("subject")
     .isString()
+    .isLength({ max: 78 })
     .not().isEmpty()
     .trim()
     .escape(),
