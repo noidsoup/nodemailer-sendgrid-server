@@ -97,7 +97,7 @@ exports.get_single_email = (req, res, next) => {
 };
 
 // Handle request for EMAILS by a given email address
-exports.get_user_emails = (req, res) => {
+exports.get_user_emails = (req, res, next) => {
   if (!req.params.email) {
     res.status(500).json({ message: "No email supplied in request" });
   };
