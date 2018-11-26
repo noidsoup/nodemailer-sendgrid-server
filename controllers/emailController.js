@@ -18,12 +18,12 @@ exports.send_email = (req, res, err) => {
     throw err;
   };
 
-  const { to, from, subject, text } = req.body
+  const { to, from, subject, body } = req.body
   const email = {
     to,
     from,
     subject,
-    text,
+    body,
     html: '<b>Hello world</b>',
     sent: false,
   };
@@ -43,61 +43,67 @@ exports.send_email = (req, res, err) => {
 
   mailer.sendMail(email, (err, sendGridRes) => {
     if (err || sendGridRes.message !== 'success') {
-      logger.error('An error has occurred while attempting to send email: ', err, sendGridRes);
-      res.sendStatus(500);
+      const error = `An error has occurred while attempting to send email. The response from Sendgrid is: ${sendGridRes.message}, and the error object is ${err}`;
+      logger.error(error);
+      res.status(500).json({ message: error});
       throw(err || sendGridRes);
     }
-
+    // Update previously saved email to reflect succesful send
     Email.findOneAndUpdate({_id: id}, { sent: true }, ((err, res) => {
       if (err) {
-        logger.error('Error saving email to MongoDB', err);
-        res.sendStatus(500);
-        throw err;
+        const error = `Error saving email to MongoDB: ${err}`
+        logger.error(error);
+        res.status(500).json({ message: error});
+        throw (error);
       }
-      logger.info('Saved email')
+      logger.info(`Saved email with ID: ${id}`)
     }))
-
-    logger.info(`Sendgrid responded with: ${sendGridRes.message}`);
-    res.sendStatus(200);
+    const msg = `Successfully sent email to ${email.to}. Sendgrid responded with: ${sendGridRes.message}`;
+    logger.info(msg);
+    res.status(200).json({ message: msg });
   });
 };
 
 // Display list of all emails.
-exports.get_emails = (req, res, next) => {
+exports.get_emails = (req, res) => {
   Email.find().exec((err, emails) => {
     if (err) {
-      res.send({ error: err });
-      return next(err);
+      const error = `Error retrieving emails from MongoDB: ${err}`
+      logger.error(error);
+      res.status(500).json({ message: error});
+      throw (error);
     }
     // Successful, so send data
+    logger.info(`Retrieving array of emails with length of ${emails.length}`);
     res.type("json");
-    res.status(200);
-    return res.json({ emails });
+    res.status(200).json({ emails });
   });
 };
 
 // Get email based on ID.
-exports.get_single_email = (req, res, next) => {
+exports.get_single_email = (req, res) => {
   if (!req.params.id) {
-    res.status(500).json({ message: "No email supplied in request" });
+    const error = "No ID supplied in request";
+    res.status(500).json({ message: error });
   };
   const id = req.params.id;
   Email.findOne({
     _id: id
   }).exec((err, emails) => {
     if (err) {
-      res.send({ error: err });
-      return next(err);
+      logger.error(err);
+      res.status(500).json({ message: err });
+      throw (err);
     }
     // Successful, so send data
+    logger.info(`Retrieving email with ID of ${id}`);
     res.type("json");
-    res.status(200);
-    return res.json({ emails });
+    res.status(200).json({ emails });
   });
 };
 
 // Handle request for EMAILS by a given email address
-exports.get_user_emails = (req, res, next) => {
+exports.get_user_emails = (req, res) => {
   if (!req.params.email) {
     res.status(500).json({ message: "No email supplied in request" });
   };
@@ -106,12 +112,12 @@ exports.get_user_emails = (req, res, next) => {
     { to: userEmail },
   ).exec((err, emails) => {
     if (err) {
-      res.send({ error: err });
-      return next(err);
+      logger.error(err);
+      res.status(500).json({ message: err });
+      throw (err);
     }
-
+    logger.info(`Retrieving emails ${emails.length} of the user ${userEmail}`);
     res.type("json");
-    res.status(200);
-    return res.json({ emails });
+    res.status(200).json({ emails });
   });
 };

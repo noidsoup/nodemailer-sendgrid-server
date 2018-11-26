@@ -31,7 +31,7 @@ router.post('/v1/emails/', [
     check('to').exists(),
     check('from').exists(),
     check('subject').exists(),
-    check('text').exists(),
+    check('body').exists(),
   ],
 
   check("to")
@@ -41,6 +41,7 @@ router.post('/v1/emails/', [
     .trim()
     .escape(),
   check("from")
+    .isEmail()
     .isString()
     .not().isEmpty()
     .trim()
@@ -51,7 +52,7 @@ router.post('/v1/emails/', [
     .not().isEmpty()
     .trim()
     .escape(),
-  check("text")
+  check("body")
     .isString()
     .not().isEmpty()
     .trim()
@@ -67,25 +68,24 @@ router.post('/v1/emails/', [
 });
 
 // GET EMAILS
-// TODO: does this validation? Can a GET request be dangerous?
 router.get('/v1/emails', (req, res) => {
   emailController.get_emails(req, res);
 });
 
+var Schema = {
+
+}
+
 // GET all emails associated with an EMAIL address
-router.get('/v1/emails/:email/messages', checkSchema({
-  email: {
-    in: ['params'],
-    isEmail: {
-      errorMessage: 'Not a valid email address'
-    },
-    isLength: {
-      errorMessage: 'Email addresses can be no longer than 254 characters (RFC 2821)',
-      // Multiple options would be expressed as an array
-      options: { max: 320 }
-    },
-  },
-}), (req, res) => {
+router.get('/v1/emails/:email/messages', [
+  check('email').isEmail(),
+  checkSchema({"email": {
+    matches: {
+      options: [/\b(?:heliosinteractive|freeman)\b/],
+      errorMessage: "Invalid email domain"
+    }
+  }}),
+], (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).json({ errors: errors.array() });
@@ -93,18 +93,7 @@ router.get('/v1/emails/:email/messages', checkSchema({
   emailController.get_user_emails(req, res);
 });
 
-router.get('/v1/emails/:id', checkSchema({
-  id: {
-    in: ['params'],
-    isString: {
-      errorMessage: 'Incorrect ID type',
-    },
-    isLength: {
-      errorMessage: 'ID is too long',
-      options: { max: 24 }
-    },
-  },
-}), (req, res) => {
+router.get('/v1/emails/:id', (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).json({ errors: errors.array() });
