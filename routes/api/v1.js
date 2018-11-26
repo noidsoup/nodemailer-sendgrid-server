@@ -35,26 +35,26 @@ router.post('/v1/emails/', [
   ],
 
   check("to")
-    .isEmail()
-    .isString()
-    .not().isEmpty()
+    .isEmail().withMessage('"to" field is not a valid email addres')
+    .isString().withMessage('"to" field is not a string')
+    .not().isEmpty().withMessage('"to" field is empty')
     .trim()
     .escape(),
   check("from")
-    .isEmail()
-    .isString()
-    .not().isEmpty()
+    .isEmail().withMessage('"from" field is not a valid address')
+    .isString().withMessage('"from" field is not a string')
+    .not().isEmpty().withMessage('"from" field is empty')
     .trim()
     .escape(),
   check("subject")
-    .isString()
-    .isLength({ max: 78 })
-    .not().isEmpty()
+    .isString().withMessage('"subject" field is not a string')
+    .isLength({ max: 78 }).withMessage('"subject" has a max length of 78 characters')
+    .not().isEmpty().withMessage('"subject" field is empty')
     .trim()
     .escape(),
   check("body")
-    .isString()
-    .not().isEmpty()
+    .isString().withMessage('"body" field is not a string')
+    .not().isEmpty().withMessage('"body" field is empty')
     .trim()
     .escape(),
 ], (req, res) => {
