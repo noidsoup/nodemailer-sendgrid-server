@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { check, validationResult } = require("express-validator/check");
+const { check, checkSchema, validationResult } = require("express-validator/check");
 
 /* Main routing engine.
 * Takes all requests before forwarding to the approriate controller.
@@ -66,15 +66,50 @@ router.post('/v1/emails/', [
   emailController.send_email(req, res);
 });
 
-// SEND EMAIL
+// GET EMAILS
+// TODO: does this validation? Can a GET request be dangerous?
 router.get('/v1/emails', (req, res) => {
-  // Finds the validation errors in this request and wraps them in an object with handy functions
+  emailController.get_emails(req, res);
+});
+
+// GET all emails associated with an EMAIL address
+router.get('/v1/emails/:email/messages', checkSchema({
+  email: {
+    in: ['params'],
+    isEmail: {
+      errorMessage: 'Not a valid email address'
+    },
+    isLength: {
+      errorMessage: 'Email addresses can be no longer than 254 characters (RFC 2821)',
+      // Multiple options would be expressed as an array
+      options: { max: 320 }
+    },
+  },
+}), (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).json({ errors: errors.array() });
   }
+  emailController.get_user_emails(req, res);
+});
 
-  emailController.get_emails(req, res);
+router.get('/v1/emails/:id', checkSchema({
+  id: {
+    in: ['params'],
+    isString: {
+      errorMessage: 'Incorrect ID type',
+    },
+    isLength: {
+      errorMessage: 'ID is too long',
+      options: { max: 24 }
+    },
+  },
+}), (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors.array() });
+  }
+  emailController.get_single_email(req, res);
 });
 
 module.exports = router;

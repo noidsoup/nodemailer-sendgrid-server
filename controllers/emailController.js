@@ -1,7 +1,8 @@
-const logger = require('../utils/logger');
-const Email = require("../models/email");
 const nodemailer = require('nodemailer');
 const sgTransport = require('nodemailer-sendgrid-transport');
+const logger = require('../utils/logger');
+
+const Email = require("../models/email");
 
 const options = {
   auth: {
@@ -61,6 +62,56 @@ exports.send_email = (req, res, err) => {
   });
 };
 
-exports.get_emails = (req, res, err) => {
-  console.log(req.body);
+// Display list of all emails.
+exports.get_emails = (req, res, next) => {
+  Email.find().exec((err, emails) => {
+    if (err) {
+      res.send({ error: err });
+      return next(err);
+    }
+    // Successful, so send data
+    res.type("json");
+    res.status(200);
+    return res.json({ emails });
+  });
+};
+
+// Get email based on ID.
+exports.get_single_email = (req, res, next) => {
+  if (!req.params.id) {
+    res.status(500).json({ message: "No email supplied in request" });
+  };
+  const id = req.params.id;
+  Email.findOne({
+    _id: id
+  }).exec((err, emails) => {
+    if (err) {
+      res.send({ error: err });
+      return next(err);
+    }
+    // Successful, so send data
+    res.type("json");
+    res.status(200);
+    return res.json({ emails });
+  });
+};
+
+// Handle request for EMAILS by a given email address
+exports.get_user_emails = (req, res) => {
+  if (!req.params.email) {
+    res.status(500).json({ message: "No email supplied in request" });
+  };
+  const userEmail = req.params.email;
+  Email.find(
+    { to: userEmail },
+  ).exec((err, emails) => {
+    if (err) {
+      res.send({ error: err });
+      return next(err);
+    }
+
+    res.type("json");
+    res.status(200);
+    return res.json({ emails });
+  });
 };
