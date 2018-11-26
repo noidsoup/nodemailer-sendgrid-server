@@ -79,7 +79,7 @@ var Schema = {
 // GET all emails associated with an EMAIL address
 router.get('/v1/emails/:email/messages', [
   check('email').isEmail(),
-  checkSchema({"email": {
+  checkSchema({'email': {
     matches: {
       options: [/\b(?:heliosinteractive|freeman)\b/],
       errorMessage: "Invalid email domain"
