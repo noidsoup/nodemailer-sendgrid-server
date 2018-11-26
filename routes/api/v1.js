@@ -26,7 +26,7 @@ router.get("/v1", (req, res) => {
 });
 
 // SEND EMAIL
-router.post('/v1/emails/send', [
+router.post('/v1/emails/', [
   [
     check('to').exists(),
     check('from').exists(),
@@ -63,7 +63,18 @@ router.post('/v1/emails/send', [
     return res.status(422).json({ errors: errors.array() });
   }
 
-  emailController(req, res);
+  emailController.send_email(req, res);
+});
+
+// SEND EMAIL
+router.get('/v1/emails', (req, res) => {
+  // Finds the validation errors in this request and wraps them in an object with handy functions
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors.array() });
+  }
+
+  emailController.get_emails(req, res);
 });
 
 module.exports = router;

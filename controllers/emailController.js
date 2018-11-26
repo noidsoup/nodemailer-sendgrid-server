@@ -11,7 +11,7 @@ const options = {
 
 const mailer = nodemailer.createTransport(sgTransport(options));
 
-const emailController = (req, res, err) => {
+exports.send_email = (req, res, err) => {
   if (err) {
     logger.error('Error making request to emailController', err);
     throw err;
@@ -61,4 +61,6 @@ const emailController = (req, res, err) => {
   });
 };
 
-module.exports = emailController;
+exports.get_emails = (req, res, err) => {
+  console.log(req.body);
+};
