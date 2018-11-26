@@ -26,7 +26,7 @@ router.get("/v1", (req, res) => {
 });
 
 // SEND EMAIL
-router.post('/v1/emails/send', [
+router.post('/v1/emails/', [
   [
     check('to').exists(),
     check('from').exists(),
