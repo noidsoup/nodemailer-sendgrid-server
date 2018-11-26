@@ -1,10 +1,12 @@
 require("dotenv").config();
 const config = require("./config");
 const express = require("express");
-const app = express();
 const bodyParser = require('body-parser');
 const logger = require('./utils/logger');
 
+const api = require("./routes/api/v1");
+
+const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
@@ -23,6 +25,6 @@ db.on("connected", () => {
 });
 db.on("error", logger.error.bind(logger, "MongoDB connection error;"));
 
-app.post('/send', require('./routes/send'));
+app.use("/api", api);
 
 app.listen(process.env.SERVER_PORT, () => logger.info(`email service listening on port ${process.env.SERVER_PORT}!`))
