@@ -24,7 +24,7 @@ exports.send_email = (req, res, err) => {
     from,
     subject,
     body,
-    html: '<b>Hello world</b>',
+    html: `<h1>${body}</h1>`,
     sent: false,
   };
 
@@ -107,17 +107,18 @@ exports.get_user_emails = (req, res) => {
   if (!req.params.email) {
     res.status(500).json({ message: "No email supplied in request" });
   };
-  const userEmail = req.params.email;
-  Email.find(
-    { to: userEmail },
-  ).exec((err, emails) => {
+  const emailAddress = req.params.email;
+  Email.find({
+    $and : [{ $or : [ { to : emailAddress }, { from : emailAddress } ] }]
+  }).exec((err, emails) => {
     if (err) {
       logger.error(err);
       res.status(500).json({ message: err });
       throw (err);
     }
-    logger.info(`Retrieving emails ${emails.length} of the user ${userEmail}`);
+    logger.info(`Retrieving emails ${emails.length} of the user ${emailAddress}`);
     res.type("json");
     res.status(200).json({ emails });
   });
 };
+
