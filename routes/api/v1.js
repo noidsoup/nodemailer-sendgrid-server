@@ -35,26 +35,27 @@ router.post('/v1/emails/', [
   ],
 
   check("to")
-    .isEmail().withMessage('"to" field is not a valid email addres')
-    .isString().withMessage('"to" field is not a string')
-    .not().isEmpty().withMessage('"to" field is empty')
+    .isEmail().withMessage('to field is not a valid email address')
+    .isString().withMessage('to field is not a string')
+    .not().isEmpty().withMessage('to field is empty')
     .trim()
     .escape(),
   check("from")
-    .isEmail().withMessage('"from" field is not a valid address')
-    .isString().withMessage('"from" field is not a string')
-    .not().isEmpty().withMessage('"from" field is empty')
+    .isEmail().withMessage('from field is not a valid address')
+    .isString().withMessage('from field is not a string')
+    .not().isEmpty().withMessage('from field is empty')
     .trim()
-    .escape(),
+    .escape()
+    .matches(/\b(?:heliosinteractive|freeman)\b/),
   check("subject")
-    .isString().withMessage('"subject" field is not a string')
-    .isLength({ max: 78 }).withMessage('"subject" has a max length of 78 characters')
-    .not().isEmpty().withMessage('"subject" field is empty')
+    .isString().withMessage('subject field is not a string')
+    .isLength({ max: 78 }).withMessage('subject has a max length of 78 characters')
+    .not().isEmpty().withMessage('subject field is empty')
     .trim()
     .escape(),
   check("body")
-    .isString().withMessage('"body" field is not a string')
-    .not().isEmpty().withMessage('"body" field is empty')
+    .isString().withMessage('body field is not a string')
+    .not().isEmpty().withMessage('body field is empty')
     .trim()
     .escape(),
 ], (req, res) => {
@@ -78,13 +79,9 @@ var Schema = {
 
 // GET all emails associated with an EMAIL address
 router.get('/v1/emails/:email/messages', [
-  check('email').isEmail(),
-  checkSchema({'email': {
-    matches: {
-      options: [/\b(?:heliosinteractive|freeman)\b/],
-      errorMessage: "Invalid email domain"
-    }
-  }}),
+  check('email')
+    .isEmail()
+    .withMessage('to field is not a valid email address'),
 ], (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
