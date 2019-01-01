@@ -23,7 +23,6 @@ SENDGRID_API_KEY=SG.##############################
 ```
 POST {{url}}/emails/
 ```
-A demonstration of sending an email via sendgrid and nodemailer. Every email is saved to a local mongo DB, in a collection called "Email"
 
 In order to send an email, start the server and send a post request to the endpoint:
 
