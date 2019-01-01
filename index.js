@@ -35,4 +35,4 @@ db.on("error", logger.error.bind(logger, "MongoDB connection error;"));
 
 app.use("/api", api);
 
-app.listen(process.env.SERVER_PORT, () => logger.info(`email service listening on port ${process.env.SERVER_PORT}!`))
+app.listen(process.env.SERVER_PORT, () => logger.info(`email service listening in ${process.env.NODE_ENV} on port ${process.env.SERVER_PORT}!`))
