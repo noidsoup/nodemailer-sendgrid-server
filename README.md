@@ -13,12 +13,22 @@ npm start
 Create a .env file and populate with your keys.
 
 Example: 
-
+```
 NODE_ENV=dev
 SERVER_PORT=3001
 SENDGRID_API_KEY=SG.##############################
+```
 
 ### Usage
 A demonstration of sending an email via sendgrid and nodemailer. Every email is saved to a local mongo DB, in a collection called "Email"
 
-In order to send an email,  
+In order to send an email, start the server and send a post request to the endpoint:
+
+```
+{
+  "to": "nicholas.eymann@xyz.com",
+  "from": "web@xyz.com",
+  "subject": "hello",
+  "body": "world"
+}
+```
