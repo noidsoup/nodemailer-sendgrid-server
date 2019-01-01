@@ -8,7 +8,7 @@ You must be running mongo DB locally on your machine in order for the applicatio
 ```
 npm install
 npm start
-'''
+```
 
 Create a .env file and populate with your keys.
 
