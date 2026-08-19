@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon"
+    "start": "nodemon",
+    "verify": "bash .verify.sh"
   },
   "author": "",
   "license": "ISC",
